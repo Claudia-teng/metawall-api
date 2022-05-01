@@ -11,7 +11,9 @@ const userSchema = new mongoose.Schema({
       lowercase: true,
       select: false
     },
-    photo: String,
+    photo: {
+      type: String
+    }
   });
 
 const User = mongoose.model('user', userSchema);

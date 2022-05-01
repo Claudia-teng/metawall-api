@@ -2,31 +2,27 @@ const mongoose = require('mongoose');
 
 const postsSchema = new mongoose.Schema({
   user: {
-    type: mongoose.Schema.ObjectId,
-    ref: "user",
-    required: [true, 'Name is required']
+    type: String,
+    // type: mongoose.Schema.ObjectId,
+    // ref: "user",
+    required: [true, 'Please specify the user.']
   },
   tags: {
     type: [ String ],
-    required: [true, 'Tags are required']
-  },
-  type: {
-    type: String,
-    enum: ['group', 'person'],
-    required: [true, 'Type is required']
+    required: [true, 'Please enter at least one tag.']
   },
   image: {
     type: String,
     default: ""
   },
-  createAt: {
+  createdAt: {
     type: Date,
     default: Date.now,
-    select: false
+    // select: false
   },
   content: {
     type: String,
-    required: [true, 'Content is required']
+    required: [true, 'Please enter the content.']
   },
   likes: {
     type: Number,
