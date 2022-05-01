@@ -1,38 +1,44 @@
 const Posts = require('../models/posts');
+const Users = require('../models/users');
 
 async function getPosts (req, res) {
   // asc -> old to new
   // desc -> new to old
   const timeSort = { "createdAt": req.query.timeSort === "asc" ? 1 : -1};
   const q = req.query.q !== undefined ? {"content": new RegExp(req.query.q)} : {};
-  const allPost = await Posts
-    .find(q)
-    .sort(timeSort);
-  // const post = await Post.find(q).populate({
-  //   path: 'user',
-  //   select: 'name photo '
-  // }).sort(timeSort);
-  res.status(200).json(await allPost);
+  const allPost = await Posts.find(q).populate({
+    path: 'userId',
+    select: 'name photo '
+  }).sort(timeSort);
+  return res.status(200).json(await allPost);
 }
 
 async function createPost (req, res) {
   try {
     const data = req.body;
-    if (data.content) {
+    const existUser = await existsUserWithId(data.userId);
+
+    if (!existUser) {
+      return res.status(400).json({
+        err: 'User not found!'
+      });
+    }
+
+    if (!data.content) {
+      return res.status(400).json({
+        error: 'Please enter the content.'
+      });
+    } else {
       const newPost = await Posts.create({
-        user: data.user,
+        userId: data.userId,
         content: data.content,
         tags: data.tags,
         image: data.image
       })
-      res.status(201).json(await newPost);
-    } else {
-      res.status(400).json({
-        error: 'Please enter the content.'
-      });
+      return res.status(201).json(await newPost);
     }
   } catch(err) {
-    res.status(400).json({
+    return res.status(400).json({
       error: err.message
     });
   }
@@ -40,7 +46,7 @@ async function createPost (req, res) {
 
 async function deleteAllPosts(req, res) {
   await Posts.deleteMany({});
-  res.status(200).json({
+  return res.status(200).json({
     ok: true
   });
 }
@@ -48,19 +54,20 @@ async function deleteAllPosts(req, res) {
 async function deletePost(req, res) {
   const id = req.params.id;
   const existPost = await existsPostWithId(id);
+
   try {
-    if (existPost) {
-      await Posts.findByIdAndDelete(id);
-      res.status(200).json({
-        ok: true
+    if (!existPost) {
+      return res.status(400).json({
+        error: "Post not found!"
       });
     } else {
-      res.status(400).json({
-        error: "Post not found!"
+      await Posts.findByIdAndDelete(id);
+      return res.status(200).json({
+        ok: true
       });
     }
   } catch (err) {
-    res.status(400).json({
+    return res.status(400).json({
       error: err.message
     });
   }
@@ -73,14 +80,18 @@ async function editPost(req, res) {
     const existPost = await existsPostWithId(id);
 
     if (!existPost) {
-      res.status(400).json({
+      return res.status(400).json({
         error: 'Post not found!'
       });
     }
 
-    if (data.content) {
+    if (!data.content) {
+      return res.status(400).json({
+        error: "Please enter the content."
+      });
+    } else {
       const editedPost = await Posts.findByIdAndUpdate(id, {
-        user: data.user,
+        userId: data.userId,
         content: data.content,
         tags: data.tags,
         image: data.image
@@ -88,14 +99,10 @@ async function editPost(req, res) {
         new: true,
         runValidators: true
       })
-      res.status(200).json(await editedPost);
-    } else {
-      res.status(400).json({
-        error: "Please enter the content."
-      });
+      return res.status(200).json(await editedPost);
     }
   } catch (err) {
-    res.status(400).json({
+    return res.status(400).json({
       error: err.message
     });
   }
@@ -104,6 +111,14 @@ async function editPost(req, res) {
 async function existsPostWithId(id) {
   try {
     return await Posts.findById(id);
+  } catch (err) {
+    return null;
+  }
+}
+
+async function existsUserWithId(id) {
+  try {
+    return await Users.findById(id);
   } catch (err) {
     return null;
   }

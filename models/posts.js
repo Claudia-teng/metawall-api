@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 
 const postsSchema = new mongoose.Schema({
-  user: {
-    type: String,
-    // type: mongoose.Schema.ObjectId,
-    // ref: "user",
+  userId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "user",
     required: [true, 'Please specify the user.']
   },
   tags: {
