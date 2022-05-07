@@ -7,8 +7,7 @@ const postsSchema = new mongoose.Schema({
     required: [true, 'Please specify the user.']
   },
   tags: {
-    type: [ String ],
-    required: [true, 'Please enter at least one tag.']
+    type: [ String ]
   },
   image: {
     type: String,
