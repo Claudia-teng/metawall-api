@@ -1,5 +1,6 @@
 const express = require('express');
 const postsRouter = express.Router();
+const { isAuth } = require('../services/auth');
 const {
   getPosts, 
   createPost,
@@ -8,10 +9,10 @@ const {
   editPost,
 } = require('../controllers/posts');
 
-postsRouter.get('/', getPosts)
-postsRouter.post('/', createPost)
-postsRouter.delete('/', deleteAllPosts)
-postsRouter.delete('/:id', deletePost)
-postsRouter.patch('/:id', editPost)
+postsRouter.get('/', isAuth, getPosts)
+postsRouter.post('/',isAuth, createPost)
+postsRouter.delete('/',isAuth, deleteAllPosts)
+postsRouter.delete('/:id',isAuth, deletePost)
+postsRouter.patch('/:id',isAuth, editPost)
 
 module.exports = postsRouter;
