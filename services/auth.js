@@ -36,11 +36,9 @@ function generateJWT(user, statusCode, res) {
     expiresIn: process.env.JWT_EXPIRES_DAY
   })
   res.status(statusCode).json({
-    user: {
-      token,
-      name: user.name,
-      photo: user.photo
-    }
+    token,
+    name: user.name,
+    photo: user.photo
   })
 }
 
