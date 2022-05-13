@@ -38,7 +38,8 @@ function generateJWT(user, statusCode, res) {
   res.status(statusCode).json({
     user: {
       token,
-      name: user.name
+      name: user.name,
+      photo: user.photo
     }
   })
 }
