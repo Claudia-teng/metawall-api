@@ -101,7 +101,114 @@ async function login (req, res) {
   generateJWT(user, 200, res);
 }
 
+async function updatePassword(req, res) {
+  let { password, newPassword, confirmPassword } = req.body;
+
+  // verify required fields
+  if (!password) {
+    return res.status(400).json({
+      error: 'Please enter the password.'
+    });
+  }
+  else if (!newPassword) {
+    return res.status(400).json({
+      error: 'Please enter the new password.'
+    });
+  } else if (!confirmPassword) {
+    return res.status(400).json({
+      error: 'Please enter the confirm password.'
+    });
+  }
+
+  // verify confirm password
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({
+      error: 'New password and confirm password must be match.'
+    });
+  }
+
+  // verify password length
+  if (!validator.isLength(newPassword, { min: 8 })) {
+    return res.status(400).json({
+      error: 'New password must be at least 8 characters.'
+    });
+  }
+
+  // verify current password
+  try {
+    const user = await User.findById(req.user.id).select('+password');
+    if (!user) {
+      return res.status(400).json({
+        error: 'User not found.'
+      });
+    }
+
+    const auth = await bcrypt.compare(password, user.password);
+    if (!auth) {
+      return res.status(400).json({
+        error: 'Your password is incorrect.'
+      });
+    }
+  } catch(err) {
+    return res.status(400).json({
+      error: 'User not found.'
+    });
+  }
+
+  // encrypt password
+  newPassword = await bcrypt.hash(newPassword, 12);
+
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      password: newPassword
+    }, {
+      runValidators: true
+    });
+    return res.status(200).json({
+      ok: true
+    });
+  } catch(err) {
+    return res.status(400).json({
+      error: err.message
+    });
+  }
+}
+
+async function getProfile(req, res) {
+  res.status(200).json(req.user);
+}
+
+async function updateProfile(req, res) {
+  const { name, photo } = req.body;
+
+  if (!name) {
+    return res.status(400).json({
+      error: 'Name is required.'
+    });
+  }
+
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      name: name,
+      photo: photo || ''
+    }, {
+      runValidators: true
+    });
+
+    return res.status(200).json({
+      ok: true
+    });
+  } catch(err) {
+    return res.status(400).json({
+      error: err.message
+    });
+  }
+}
+
 module.exports = {
   signup,
-  login
+  login,
+  updatePassword,
+  getProfile,
+  updateProfile
 }
