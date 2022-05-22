@@ -2,14 +2,16 @@ const express = require('express');
 const api = express.Router();
 const postsRouter = require('./posts')
 const usersRouter = require('./users')
+const uploadRouter = require('./upload')
 
 api.use('/posts', postsRouter);
 api.use('/users', usersRouter);
+api.use('/upload', uploadRouter);
 
 api.use((req, res, next) => {
   res.status(404).json({
     "status": "false",
-    "message": "No route"
+    "message": "Route not found"
   });
 });
 
