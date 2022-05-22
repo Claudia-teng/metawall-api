@@ -8,7 +8,7 @@ async function getPosts (req, res) {
   const q = req.query.q !== undefined ? {"content": new RegExp(req.query.q)} : {};
   const allPost = await Posts.find(q).populate({
     path: 'userId',
-    select: 'name photo '
+    select: 'name photo'
   }).sort(timeSort);
   return res.status(200).json(await allPost);
 }
@@ -16,9 +16,9 @@ async function getPosts (req, res) {
 async function createPost (req, res) {
   try {
     const data = req.body;
-    const existUser = await existsUserWithId(data.userId);
+    const user = await existsUserWithId(data.userId);
 
-    if (!existUser) {
+    if (!user) {
       return res.status(400).json({
         err: 'User not found!'
       });
@@ -53,10 +53,10 @@ async function deleteAllPosts(req, res) {
 
 async function deletePost(req, res) {
   const id = req.params.id;
-  const existPost = await existsPostWithId(id);
+  const post = await existsPostWithId(id);
 
   try {
-    if (!existPost) {
+    if (!post) {
       return res.status(400).json({
         error: "Post not found!"
       });
@@ -108,6 +108,54 @@ async function editPost(req, res) {
   }
 }
 
+async function likePost(req, res) {
+  const id = req.params.id;
+  const existPost = await existsPostWithId(id);
+
+  try {
+    if (!existPost) {
+      return res.status(400).json({
+        error: "Post not found!"
+      });
+    } else {
+      await Posts.findByIdAndUpdate(id, {
+        $addToSet:{ likes: req.user.id }
+      })
+      return res.status(201).json({
+        ok: true
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({
+      error: err.message
+    });
+  }
+}
+
+async function unlikePost(req, res) {
+  const id = req.params.id;
+  const existPost = await existsPostWithId(id);
+
+  try {
+    if (!existPost) {
+      return res.status(400).json({
+        error: "Post not found!"
+      });
+    } else {
+      await Posts.findByIdAndUpdate(id, {
+        $pull:{ likes: req.user.id }
+      })
+      return res.status(201).json({
+        ok: true
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({
+      error: err.message
+    });
+  }
+}
+
 async function existsPostWithId(id) {
   try {
     return await Posts.findById(id);
@@ -130,4 +178,6 @@ module.exports = {
   deleteAllPosts,
   deletePost,
   editPost,
+  likePost,
+  unlikePost
 }

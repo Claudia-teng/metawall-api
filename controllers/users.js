@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs')
 const validator = require('validator');
-const User = require('../models/users');
+const Users = require('../models/users');
+const Posts = require('../models/posts');
 const { generateJWT } = require('../services/auth');
 
 async function signup (req, res) {
@@ -46,11 +47,20 @@ async function signup (req, res) {
     });
   }
 
+  // verify duplicate email
+  const existEmail = await Users.findOne({email});
+  console.log('existEmail', existEmail)
+  if (existEmail) {
+    return res.status(400).json({
+      error: 'This email has signed up before.'
+    });
+  }
+
   // encrypt password
   password = await bcrypt.hash(password, 12);
 
   try {
-    const newUser = await User.create({
+    const newUser = await Users.create({
       name,
       email, 
       password,
@@ -84,7 +94,7 @@ async function login (req, res) {
     });
   }
 
-  const user = await User.findOne({email}).select('+password');
+  const user = await Users.findOne({email}).select('+password');
   if (!user) {
     return res.status(400).json({
       error: 'This email has not been signed up yet.'
@@ -136,7 +146,7 @@ async function updatePassword(req, res) {
 
   // verify current password
   try {
-    const user = await User.findById(req.user.id).select('+password');
+    const user = await Users.findById(req.user.id).select('+password');
     if (!user) {
       return res.status(400).json({
         error: 'User not found.'
@@ -159,7 +169,7 @@ async function updatePassword(req, res) {
   newPassword = await bcrypt.hash(newPassword, 12);
 
   try {
-    await User.findByIdAndUpdate(req.user.id, {
+    await Users.findByIdAndUpdate(req.user.id, {
       password: newPassword
     }, {
       runValidators: true
@@ -188,7 +198,7 @@ async function updateProfile(req, res) {
   }
 
   try {
-    await User.findByIdAndUpdate(req.user.id, {
+    await Users.findByIdAndUpdate(req.user.id, {
       name: name,
       photo: photo || ''
     }, {
@@ -205,10 +215,44 @@ async function updateProfile(req, res) {
   }
 }
 
+async function getUserPost(req, res) {
+  const id = req.params.id;
+  const user = await existsUserWithId(id);
+
+  if (!user) {
+    return res.status(400).json({
+      err: 'User not found!'
+    });
+  }
+
+  const posts = Posts.find({user});
+  return res.status(200).json(await posts);
+}
+
+async function getLikeList(req, res) {
+  const likedPosts = await Posts.find({
+    likes: { $in: [req.user.id] }
+  }).populate({
+    path: 'likes',
+    select:"name _id"
+  })
+  return res.status(200).json(await likedPosts);
+}
+
+async function existsUserWithId(id) {
+  try {
+    return await Users.findById(id);
+  } catch (err) {
+    return null;
+  }
+}
+
 module.exports = {
   signup,
   login,
   updatePassword,
   getProfile,
-  updateProfile
+  updateProfile,
+  getUserPost,
+  getLikeList
 }

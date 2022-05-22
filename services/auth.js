@@ -18,7 +18,9 @@ async function isAuth(req, res, next) {
   const decoded = await new Promise((resolve, reject) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
       if (err) {
-        reject(err);
+        return res.status(401).json({
+          error: 'Invalid token.'
+        });
       } else {
         resolve(payload);
       }

@@ -6,7 +6,9 @@ const {
   login,
   updatePassword,
   getProfile,
-  updateProfile
+  updateProfile,
+  getUserPost,
+  getLikeList
 } 
 = require('../controllers/users');
 
@@ -15,5 +17,7 @@ usersRouter.post('/login', login);
 usersRouter.post('/update-password', isAuth, updatePassword);
 usersRouter.get('/profile', isAuth, getProfile);
 usersRouter.patch('/profile', isAuth, updateProfile);
+usersRouter.get('/:id', isAuth, getUserPost);
+usersRouter.get('/like-list', isAuth, getLikeList);
 
 module.exports = usersRouter;

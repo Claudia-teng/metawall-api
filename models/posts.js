@@ -22,8 +22,8 @@ const postsSchema = new mongoose.Schema({
     required: [true, 'Please enter the content.']
   },
   likes: {
-    type: Number,
-    default: 0
+    type: [ mongoose.Schema.ObjectId ],
+    ref: 'user',
   },
   comments: {
     type: Number,
