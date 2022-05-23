@@ -20,7 +20,7 @@ async function createPost (req, res) {
 
     if (!user) {
       return res.status(400).json({
-        err: 'User not found!'
+        error: 'User not found!'
       });
     }
 

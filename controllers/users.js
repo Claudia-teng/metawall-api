@@ -221,7 +221,7 @@ async function getUserPost(req, res) {
 
   if (!user) {
     return res.status(400).json({
-      err: 'User not found!'
+      error: 'User not found!'
     });
   }
 
@@ -233,8 +233,8 @@ async function getLikeList(req, res) {
   const likedPosts = await Posts.find({
     likes: { $in: [req.user.id] }
   }).populate({
-    path: 'likes',
-    select:"name _id"
+    path: 'userId',
+    select:"name photo"
   })
   return res.status(200).json(await likedPosts);
 }

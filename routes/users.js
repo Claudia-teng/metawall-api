@@ -17,7 +17,7 @@ usersRouter.post('/login', login);
 usersRouter.post('/update-password', isAuth, updatePassword);
 usersRouter.get('/profile', isAuth, getProfile);
 usersRouter.patch('/profile', isAuth, updateProfile);
-usersRouter.get('/:id', isAuth, getUserPost);
 usersRouter.get('/like-list', isAuth, getLikeList);
+usersRouter.get('/:id', isAuth, getUserPost);
 
 module.exports = usersRouter;
