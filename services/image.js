@@ -7,8 +7,6 @@ const upload = multer({
   fileFilter(req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();
     if (ext !== '.jpg' && ext !== '.png' && ext !== '.jpeg') {
-      // todo - error handling
-      // file size & wrong file type
       cb(new Error('Wrong file type. Please upload only JPG, PNG or JPEG.'))
     }
     cb(null, true)
