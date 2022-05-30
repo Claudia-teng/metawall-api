@@ -1,6 +1,7 @@
 const http = require('http');
 const app = require('./app');
 const mongoConnect = require('./services/mongo');
+require('./services/passport');
 
 const PORT = process.env.PORT || 8000;
 const server = http.createServer(app);

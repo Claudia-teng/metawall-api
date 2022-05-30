@@ -49,7 +49,6 @@ async function signup (req, res) {
 
   // verify duplicate email
   const existEmail = await Users.findOne({email});
-  console.log('existEmail', existEmail)
   if (existEmail) {
     return res.status(400).json({
       error: 'This email has signed up before.'

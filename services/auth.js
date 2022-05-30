@@ -37,7 +37,7 @@ function generateJWT(user, statusCode, res) {
   const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_DAY
   })
-  res.status(statusCode).json({
+  return res.status(statusCode).json({
     token,
     name: user.name,
     photo: user.photo

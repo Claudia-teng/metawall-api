@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema({
       type: [ mongoose.Schema.ObjectId ],
       ref: 'user',
     },
+    googleId: {
+      type: String
+    },
     createdAt: {
       type: Date,
       default: Date.now,
