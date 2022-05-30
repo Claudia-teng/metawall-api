@@ -225,11 +225,108 @@ async function getLikeList(req, res) {
   return res.status(200).json(await likedPosts);
 }
 
+async function followUser(req, res) {
+  const targetUserId = req.params.id;
+  const user = await existsUserWithId(targetUserId);
+
+  try {
+    if (req.user.id === targetUserId) {
+      return res.status(400).json({
+        error: "You can not follow yourself."
+      });
+    }
+  
+    if (!user) {
+      return res.status(400).json({
+        error: "User not found."
+      });
+    }
+
+    await Users.findByIdAndUpdate(req.user.id, {
+      $addToSet: { following: targetUserId}
+    })
+
+    await Users.findByIdAndUpdate(targetUserId, {
+      $addToSet: { followers: req.user.id }
+    })
+
+    return res.status(400).json({
+      ok: true
+    });
+  } catch(err) {
+    return res.status(400).json({
+      error: err.message
+    });
+  }
+}
+
+async function unfollowUser(req, res) {
+  const targetUserId = req.params.id;
+  const user = await existsUserWithId(targetUserId);
+
+  try {
+    if (req.user.id === targetUserId) {
+      return res.status(400).json({
+        error: "You can not unfollow yourself."
+      });
+    }
+  
+    if (!user) {
+      return res.status(400).json({
+        error: "User not found."
+      });
+    }
+
+    await Users.findByIdAndUpdate(req.user.id, {
+      $pull: { following: targetUserId}
+    })
+
+    await Users.findByIdAndUpdate(targetUserId, {
+      $pull: { followers: req.user.id }
+    })
+
+    return res.status(400).json({
+      ok: true
+    });
+  } catch(err) {
+    return res.status(400).json({
+      error: err.message
+    });
+  }
+}
+
+async function getFollowingList(req, res) {
+  try {
+    const users = await Users.find({
+      followers: { $in: [req.user.id] }
+    },{
+      'following': 0,
+      'followers': 0,
+    })
+    return res.status(400).json(await users);
+  } catch(err) {
+    return res.status(400).json({
+      error: err.message
+    });
+  }
+}
+
+async function existsUserWithId(id) {
+  try {
+    return await Users.findById(id);
+  } catch (err) {
+    return null;
+  }
+}
+
 module.exports = {
   signup,
   login,
   updatePassword,
   getProfile,
   updateProfile,
-  getLikeList
+  getLikeList,
+  followUser,
+  unfollowUser,
+  getFollowingList
 }

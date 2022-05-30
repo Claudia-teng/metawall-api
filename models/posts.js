@@ -23,7 +23,7 @@ const postsSchema = new mongoose.Schema({
   },
   likes: {
     type: [ mongoose.Schema.ObjectId ],
-    ref: 'user',
+    ref: "user",
   }
 },{
   versionKey: false,

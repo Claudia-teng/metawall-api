@@ -21,8 +21,8 @@ postsRouter.delete('/',isAuth, deleteAllPosts)
 postsRouter.delete('/:id',isAuth, deletePost)
 postsRouter.patch('/:id',isAuth, editPost)
 postsRouter.get('/user/:id', isAuth, getUserPost);
-postsRouter.post('/likes/:id',isAuth, likePost)
-postsRouter.delete('/likes/:id',isAuth, unlikePost)
-postsRouter.post('/comments/:id',isAuth, commentPost)
+postsRouter.post('/like/:id',isAuth, likePost)
+postsRouter.delete('/unlike/:id',isAuth, unlikePost)
+postsRouter.post('/comment/:id',isAuth, commentPost)
 
 module.exports = postsRouter;

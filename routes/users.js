@@ -7,7 +7,10 @@ const {
   updatePassword,
   getProfile,
   updateProfile,
-  getLikeList
+  getLikeList,
+  followUser,
+  unfollowUser,
+  getFollowingList
 } 
 = require('../controllers/users');
 
@@ -17,5 +20,8 @@ usersRouter.post('/update-password', isAuth, updatePassword);
 usersRouter.get('/profile', isAuth, getProfile);
 usersRouter.patch('/profile', isAuth, updateProfile);
 usersRouter.get('/like-list', isAuth, getLikeList);
+usersRouter.post('/follow/:id', isAuth, followUser);
+usersRouter.delete('/unfollow/:id', isAuth, unfollowUser);
+usersRouter.get('/following', isAuth, getFollowingList);
 
 module.exports = usersRouter;
