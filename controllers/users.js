@@ -110,6 +110,45 @@ async function login (req, res) {
   generateJWT(user, 200, res);
 }
 
+async function googleCallBack(req, res) {
+  const profile = req.user;
+  // console.log(profile)
+  // todo - handle google auth error
+
+  // if user login with Google before
+  let user = await Users.findOne({ googleId: profile.id });
+  if (user) {
+    return generateJWT(user, 200, res);
+  }
+
+  // if user hasn't login with Google but signed up before
+  user = await Users.findOneAndUpdate(
+    { email: profile.emails[0].value },
+    { googleId: profile.id }
+  );
+
+  if(user) {
+    return generateJWT(user, 200, res);
+  }
+
+  // if user hasn't logged with Google & signed up before
+  try {
+    const password = await bcrypt.hash(profile.id, 12);
+    const newUser = await Users.create({
+      email: profile.emails[0].value,
+      name: profile.displayName,
+      photo: profile.photos[0].value,
+      password,
+      googleId: profile.id
+    })
+    return generateJWT(newUser, 201, res);
+  } catch(err) {
+    return res.status(400).json({
+      error: err.message
+    })
+  }
+}
+
 async function updatePassword(req, res) {
   let { password, newPassword, confirmPassword } = req.body;
 
@@ -321,6 +360,7 @@ async function existsUserWithId(id) {
 module.exports = {
   signup,
   login,
+  googleCallBack,
   updatePassword,
   getProfile,
   updateProfile,
