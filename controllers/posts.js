@@ -1,16 +1,43 @@
 const Posts = require('../models/posts');
 const Users = require('../models/users');
+const Comments = require('../models/comments');
 
 async function getPosts (req, res) {
   // asc -> old to new
   // desc -> new to old
   const timeSort = { "createdAt": req.query.timeSort === "asc" ? 1 : -1};
   const q = req.query.q !== undefined ? {"content": new RegExp(req.query.q)} : {};
-  const allPost = await Posts.find(q).populate({
-    path: 'userId',
-    select: 'name photo'
-  }).sort(timeSort);
+  const allPost = await Posts.find(q)
+    .populate({
+      path: 'userId',
+      select: 'name photo'
+    })
+    .populate({
+      path: 'comments',
+      select: 'comment user'
+    })
+    .sort(timeSort);
   return res.status(200).json(await allPost);
+}
+
+async function getSinglePost (req, res) {
+  const id = req.params.id
+  const existPost = await existsPostWithId(id);
+
+  try {
+    if (!existPost) {
+      return res.status(400).json({
+        error: 'Post not found!'
+      });
+    }
+
+    const post = await Posts.findById(id);
+    return res.status(200).json(await post);
+  } catch(err) {
+    return res.status(400).json({
+      error: err.message
+    });
+  }
 }
 
 async function createPost (req, res) {
@@ -156,6 +183,61 @@ async function unlikePost(req, res) {
   }
 }
 
+async function getUserPost(req, res) {
+  const id = req.params.id;
+  const user = await existsUserWithId(id);
+
+  if (!user) {
+    return res.status(400).json({
+      error: 'User not found!'
+    });
+  }
+
+  const posts = Posts.find({user})
+    .populate({
+      path: 'userId',
+      select: 'name photo'
+    })
+    .populate({
+      path: 'comments',
+      select: 'comment user'
+    });
+  return res.status(200).json(await posts);
+}
+
+async function commentPost(req, res) {
+  const id = req.params.id;
+  const existPost = await existsPostWithId(id);
+  const { comment } = req.body;
+
+  try {
+    if (!comment) {
+      return res.status(400).json({
+        error: "Please enter the comments."
+      });
+    }
+
+    if (!existPost) {
+      return res.status(400).json({
+        error: "Post not found!"
+      });
+    } else {
+      await Comments.create({
+        user: req.user.id,
+        postId: id,
+        comment
+      });
+      return res.status(401).json({
+        ok: true
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({
+      error: err.message
+    });
+  }
+}
+
 async function existsPostWithId(id) {
   try {
     return await Posts.findById(id);
@@ -174,10 +256,13 @@ async function existsUserWithId(id) {
 
 module.exports = {
   getPosts, 
+  getSinglePost,
   createPost,
   deleteAllPosts,
   deletePost,
   editPost,
   likePost,
-  unlikePost
+  unlikePost,
+  commentPost,
+  getUserPost
 }

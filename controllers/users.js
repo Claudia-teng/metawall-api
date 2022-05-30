@@ -215,20 +215,6 @@ async function updateProfile(req, res) {
   }
 }
 
-async function getUserPost(req, res) {
-  const id = req.params.id;
-  const user = await existsUserWithId(id);
-
-  if (!user) {
-    return res.status(400).json({
-      error: 'User not found!'
-    });
-  }
-
-  const posts = Posts.find({user});
-  return res.status(200).json(await posts);
-}
-
 async function getLikeList(req, res) {
   const likedPosts = await Posts.find({
     likes: { $in: [req.user.id] }
@@ -239,20 +225,11 @@ async function getLikeList(req, res) {
   return res.status(200).json(await likedPosts);
 }
 
-async function existsUserWithId(id) {
-  try {
-    return await Users.findById(id);
-  } catch (err) {
-    return null;
-  }
-}
-
 module.exports = {
   signup,
   login,
   updatePassword,
   getProfile,
   updateProfile,
-  getUserPost,
   getLikeList
 }
