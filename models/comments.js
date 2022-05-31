@@ -12,12 +12,12 @@ const commentSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
+      ref: 'User',
       require: ['true', 'User must belong to a comment']
     },
     postId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'post',
+      ref: 'Post',
       require: ['true', 'Comment must belong to a post.']
     }
   }
@@ -30,6 +30,6 @@ commentSchema.pre(/^find/, function(next) {
 
   next();
 });
-const Comment = mongoose.model('Comment', commentSchema);
+const Comments = mongoose.model('Comment', commentSchema);
 
-module.exports = Comment;
+module.exports = Comments;

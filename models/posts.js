@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const postsSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.ObjectId,
-    ref: "user",
+    ref: 'User',
     required: [true, 'Please specify the user.']
   },
   tags: {
@@ -11,7 +11,7 @@ const postsSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    default: ""
+    default: ''
   },
   createdAt: {
     type: Date,
@@ -23,7 +23,7 @@ const postsSchema = new mongoose.Schema({
   },
   likes: {
     type: [ mongoose.Schema.ObjectId ],
-    ref: "user",
+    ref: 'User',
   }
 },{
   versionKey: false,
@@ -37,6 +37,6 @@ postsSchema.virtual('comments', {
   localField: '_id'
 });
 
-const Post = mongoose.model('Post', postsSchema);
+const Posts = mongoose.model('Post', postsSchema);
 
-module.exports = Post;
+module.exports = Posts;

@@ -118,10 +118,7 @@ async function editPost(req, res) {
       });
     } else {
       const editedPost = await Posts.findByIdAndUpdate(id, {
-        userId: data.userId,
         content: data.content,
-        tags: data.tags,
-        image: data.image
       },{
         new: true,
         runValidators: true

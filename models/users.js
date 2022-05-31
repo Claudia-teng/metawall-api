@@ -22,11 +22,11 @@ const userSchema = new mongoose.Schema({
     },
     followers: {
       type: [ mongoose.Schema.ObjectId ],
-      ref: 'user',
+      ref: 'User',
     },
     following: {
       type: [ mongoose.Schema.ObjectId ],
-      ref: 'user',
+      ref: 'User',
     },
     googleId: {
       type: String
@@ -40,6 +40,6 @@ const userSchema = new mongoose.Schema({
     versionKey: false
   });
 
-const User = mongoose.model('user', userSchema);
+const Users = mongoose.model('User', userSchema);
 
-module.exports = User;
+module.exports = Users;

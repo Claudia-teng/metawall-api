@@ -30,8 +30,8 @@ async function isAuth(req, res, next) {
   // get user
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
-    res.status(400).json({
-      error: 'User not found.'
+    return res.status(400).json({
+      error: 'Token user not found.'
     })
   }
   req.user = currentUser;
