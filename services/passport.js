@@ -1,4 +1,3 @@
-const Users = require('../models/users');
 const passport = require('passport');
 const bcrypt = require('bcryptjs')
 const GoogleStrategy = require( 'passport-google-oauth20' ).Strategy;

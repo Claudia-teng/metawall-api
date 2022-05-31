@@ -113,7 +113,11 @@ async function login (req, res) {
 async function googleCallBack(req, res) {
   const profile = req.user;
   // console.log(profile)
-  // todo - handle google auth error
+  if (!profile) {
+    return res.status(400).json({
+      error: 'Failed to access Google profile.'
+    })
+  }
 
   // if user login with Google before
   let user = await Users.findOne({ googleId: profile.id });
@@ -121,7 +125,7 @@ async function googleCallBack(req, res) {
     return generateJWT(user, 200, res);
   }
 
-  // if user hasn't login with Google but signed up before
+  // if user hasn't logged in with Google but signed up before
   user = await Users.findOneAndUpdate(
     { email: profile.emails[0].value },
     { googleId: profile.id }

@@ -20,7 +20,7 @@ const {
 // auth
 usersRouter.post('/signup', signup);
 usersRouter.post('/login', login);
-usersRouter.get('/google', passport.authenticate('google', { scope: [ 'profile' ]}));
+usersRouter.get('/google', passport.authenticate('google', { scope: [ 'email', 'profile' ]}));
 usersRouter.get('/google/callback', 
   passport.authenticate('google', { session: false }), 
   googleCallBack
