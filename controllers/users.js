@@ -51,7 +51,7 @@ async function signup (req, res) {
   const existEmail = await Users.findOne({email});
   if (existEmail) {
     return res.status(400).json({
-      error: 'This email has signed up before.'
+      error: 'This email has been signed up before. If you have logged in with Google previously, please use Google to sign in.'
     });
   }
 
