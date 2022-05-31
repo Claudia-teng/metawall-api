@@ -31,7 +31,15 @@ async function getSinglePost (req, res) {
       });
     }
 
-    const post = await Posts.findById(id);
+    const post = await Posts.findById(id)
+      .populate({
+        path: 'userId',
+        select: 'name photo'
+      })
+      .populate({
+        path: 'comments',
+        select: 'comment user'
+      });
     return res.status(200).json(await post);
   } catch(err) {
     return res.status(400).json({
@@ -190,7 +198,7 @@ async function getUserPost(req, res) {
     });
   }
 
-  const posts = Posts.find({user})
+  const posts = Posts.find({userId: id})
     .populate({
       path: 'userId',
       select: 'name photo'
